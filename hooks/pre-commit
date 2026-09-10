@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# sieve pre-commit hook — blocks commits containing secrets in the STAGED
+# diff (what's actually about to be committed), not the whole working tree.
+#
+# Install:
+#   cp hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#
+# Bypass (use sparingly — e.g. a confirmed false positive):
+#   git commit --no-verify
+#
+# Tune the confidence bar for this commit only:
+#   SIEVE_MIN_CONFIDENCE=medium git commit -m "..."
+
+set -uo pipefail
+
+SIEVE_BIN="${SIEVE_BIN:-sieve}"
+MIN_CONFIDENCE="${SIEVE_MIN_CONFIDENCE:-high}"
+
+if ! command -v "$SIEVE_BIN" >/dev/null 2>&1; then
+  echo "sieve pre-commit hook: '$SIEVE_BIN' not found on PATH." >&2
+  echo "Install sieve, set SIEVE_BIN=/path/to/sieve, or skip this hook with --no-verify." >&2
+  exit 1
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+"$SIEVE_BIN" scan "$REPO_ROOT" --staged --min-confidence "$MIN_CONFIDENCE"
+status=$?
+
+if [ "$status" -eq 0 ]; then
+  exit 0
+elif [ "$status" -eq 1 ]; then
+  echo "" >&2
+  echo "sieve: possible secret(s) in staged changes — commit blocked." >&2
+  echo "Fix them, lower the bar with SIEVE_MIN_CONFIDENCE=medium|low, or bypass a confirmed false positive with: git commit --no-verify" >&2
+  exit 1
+else
+  # Deliberately fail CLOSED (block) on a scan error rather than let an
+  # unexpected sieve failure silently pass a commit through unchecked.
+  echo "" >&2
+  echo "sieve: scan itself failed (exit $status) — commit blocked to be safe." >&2
+  echo "Investigate, or bypass with: git commit --no-verify" >&2
+  exit 1
+fi

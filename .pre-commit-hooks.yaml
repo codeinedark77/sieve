@@ -1,0 +1,6 @@
+- id: sieve
+  name: sieve (secrets scan)
+  description: Blocks commits containing secrets in the staged diff — regex + entropy detection, redacted output, no libgit2 dependency.
+  entry: sieve scan --staged --min-confidence high
+  language: rust
+  pass_filenames: false
