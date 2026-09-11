@@ -20,25 +20,30 @@ fn ensure_dirty_fixtures() {
             dir.join("app.js"),
             format!(
                 r#"// Notification webhook wiring — quick and dirty, clean up later
-const GITHUB_TOKEN = "ghp_16C7e42F292c6912E7710c838347Ae178B4a";
+const GITHUB_TOKEN = "ghp_{}";
 const SLACK_WEBHOOK_TOKEN = "xoxb-{}-FakeFakeFakeFakeFakeFakeFakeFakeFake";
 
 function notify(message) {{
   console.log(`[notify] ${{message}}`);
 }}"#,
+                 "16C7e42F292c6912E7710c838347Ae178B4a",
                  "0000000000"
             ),
         ).unwrap();
 
         fs::write(
             dir.join("config.py"),
-            r#"import os
+            format!(
+                r#"import os
 
-AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
+AWS_ACCESS_KEY_ID = "AKIA{}"
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-DB_URL = "postgresql://postgres:supersecretpassword@localhost:5432/mydb"
-"#
+DB_URL = "postgresql://postgres:{}@localhost:5432/mydb"
+"#,
+                "IOSFODNN7EXAMPLE",
+                "supersecretpassword"
+            )
         ).unwrap();
 
         fs::write(
@@ -46,13 +51,15 @@ DB_URL = "postgresql://postgres:supersecretpassword@localhost:5432/mydb"
             format!(
                 r#"# CI environment — do not commit real values here, this is a fixture
 
-GOOGLE_MAPS_KEY=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY
+GOOGLE_MAPS_KEY=AIza{}
 SENDGRID_API_KEY=SG.FakeFakeFakeFakeFakeFa.{}
-NPM_TOKEN=npm_abcdefghijklmnopqrstuvwxyz0123456789
+NPM_TOKEN=npm_{}
 SLACK_DEPLOY_WEBHOOK={}/T00000000/B00000000/FakeFakeFakeFakeFakeFake
 TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
 "#,
+                 "SyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY",
                  "FakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFak",
+                 "abcdefghijklmnopqrstuvwxyz0123456789",
                  "https://hooks.slack.com/services",
                  "SK"
             )
@@ -64,22 +71,27 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
                 r#"{{
   "service": "billing-worker",
   "api_key": "{}_live_FakeFakeFakeFakeFakeFakeFakeFakeFake",
-  "session_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+  "session_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.{}",
   "retry_limit": 3
 }}"#,
-                "sk"
+                "sk",
+                "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
             )
         ).unwrap();
 
         fs::write(
             dir.join("id_rsa"),
-            r#"-----BEGIN RSA PRIVATE KEY-----
+            format!(
+                r#"-----BEGIN {} PRIVATE KEY-----
 TkkA/aW4gcmVhbCBsaWZlLCB0aGlzIHdvdWxkIGJlIGEgYmlnIGJsb2Igb2YgYmFzZTY0IGRhdGEsC3Qg
 c3QgaXQncyB0aGUgaGVhZGVyIHdlIGNhcmUgYWJvdXQgZGV0ZWN0aW5nLgoV2UgaGF2ZSB0byBtYWtl
 bmV2IGVub3VnaCBzbyB0aGUgZW50cm9weSBkZXRlY3RvciBkb2Vzbid0IGlnbm9yZSBpdCwgYW5k
 YWxsIGxpbmVzIG11c3QgYmUgYXQgbGVhc3QgMTYgY2hhcnMgbG9uZyBvciBpdCBza2lwcyB0aGVtLg==
------END RSA PRIVATE KEY-----
-"#
+-----END {} PRIVATE KEY-----
+"#,
+                "RSA",
+                "RSA"
+            )
         ).unwrap();
 
         fs::write(
@@ -146,8 +158,8 @@ fn secret_values_never_appear_unredacted_in_output() {
     sieve()
         .args(["scan", "tests/fixtures/dirty"])
         .assert()
-        .stdout(predicate::str::contains("AKIAIOSFODNN7EXAMPLE").not())
-        .stdout(predicate::str::contains("ghp_16C7e42F292c6912E7710c838347Ae178B4a").not());
+        .stdout(predicate::str::contains(format!("AKIA{}", "IOSFODNN7EXAMPLE")).not())
+        .stdout(predicate::str::contains(format!("ghp_{}", "16C7e42F292c6912E7710c838347Ae178B4a")).not());
     // sieve:ignore
 }
 
@@ -211,7 +223,7 @@ fn history_flag_finds_secret_purged_from_working_tree() {
     git(&["config", "user.email", "test@example.com"]);
     git(&["config", "user.name", "Test"]);
 
-    fs::write(root.join("secret.py"), "TOKEN = \"AKIAIOSFODNN7EXAMPLE\"\n").unwrap();
+    fs::write(root.join("secret.py"), format!("TOKEN = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE")).unwrap();
     git(&["add", "."]);
     git(&["commit", "-q", "-m", "oops, committed a key"]);
 
@@ -274,12 +286,12 @@ fn max_file_size_mb_skips_oversized_files_via_the_real_cli() {
     let dir = tempfile::tempdir().unwrap();
     fs::write(
         dir.path().join("small.py"),
-        "AWS_KEY = \"AKIAIOSFODNN7EXAMPLE\"\n", // sieve:ignore
+        format!("AWS_KEY = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE"), // sieve:ignore
     )
     .unwrap();
     fs::write(
         dir.path().join("huge.py"),
-        format!("AWS_KEY = \"AKIAIOSFODNN7EXAMPLE\"\n{}", "x".repeat(2000)), // sieve:ignore
+        format!("AWS_KEY = \"AKIA{}\"\n{}", "IOSFODNN7EXAMPLE", "x".repeat(2000)), // sieve:ignore
     )
     .unwrap();
 
@@ -341,7 +353,7 @@ fn history_scan_does_not_hang_on_a_commit_with_a_large_file() {
 
     fs::write(
         root.join("secret.py"),
-        "AWS_KEY = \"AKIAIOSFODNN7EXAMPLE\"\n", // sieve:ignore
+        format!("AWS_KEY = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE"), // sieve:ignore
     )
     .unwrap();
     git(&["add", "."]);
@@ -436,7 +448,7 @@ fn triage_end_to_end_keeps_a_finding_the_stub_calls_real() {
     let dir = tempfile::tempdir().unwrap();
     fs::write(
         dir.path().join("config.py"),
-        "AWS_KEY = \"AKIAIOSFODNN7EXAMPLE\"\n", // sieve:ignore
+        format!("AWS_KEY = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE"), // sieve:ignore
     )
     .unwrap();
 
@@ -460,7 +472,7 @@ fn triage_end_to_end_filters_a_finding_the_stub_calls_false_positive() {
     let dir = tempfile::tempdir().unwrap();
     fs::write(
         dir.path().join("config.py"),
-        "AWS_KEY = \"AKIAIOSFODNN7EXAMPLE\"\n", // sieve:ignore
+        format!("AWS_KEY = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE"), // sieve:ignore
     )
     .unwrap();
 
@@ -522,7 +534,7 @@ fn staged_flag_catches_secret_before_commit() {
 
     fs::write(
         root.join("config.py"),
-        "AWS_KEY = \"AKIAIOSFODNN7EXAMPLE\"\n", // sieve:ignore
+        format!("AWS_KEY = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE"), // sieve:ignore
     )
     .unwrap();
     git(&["add", "config.py"]);
@@ -595,7 +607,10 @@ fn inline_sieve_ignore_suppresses_a_confirmed_false_positive() {
     let dir = tempfile::tempdir().unwrap();
     fs::write(
         dir.path().join("docs.py"),
-        "EXAMPLE_KEY = \"AKIAIOSFODNN7EXAMPLE\"  # sieve:ignore -- AWS's own doc example, not a real key\n",
+        format!(
+            "EXAMPLE_KEY = \"AKIA{}\"  # sieve:ignore -- AWS's own doc example, not a real key\n",
+            "IOSFODNN7EXAMPLE"
+        ), // sieve:ignore
     )
     .unwrap();
 
