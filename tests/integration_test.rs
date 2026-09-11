@@ -20,7 +20,7 @@ fn ensure_dirty_fixtures() {
             dir.join("app.js"),
             format!(
                 r#"// Notification webhook wiring — quick and dirty, clean up later
-const GITHUB_TOKEN = "ghp_16C7e42F292c6912E7710c838347Ae178B4a"; // sieve:ignore
+const GITHUB_TOKEN = "ghp_16C7e42F292c6912E7710c838347Ae178B4a";
 const SLACK_WEBHOOK_TOKEN = "xoxb-{}-FakeFakeFakeFakeFakeFakeFakeFakeFake";
 
 function notify(message) {{
@@ -34,10 +34,10 @@ function notify(message) {{
             dir.join("config.py"),
             r#"import os
 
-AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE" // sieve:ignore
+AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-DB_URL = "postgresql://postgres:supersecretpassword@localhost:5432/mydb" // sieve:ignore
+DB_URL = "postgresql://postgres:supersecretpassword@localhost:5432/mydb"
 "#
         ).unwrap();
 
@@ -46,9 +46,9 @@ DB_URL = "postgresql://postgres:supersecretpassword@localhost:5432/mydb" // siev
             format!(
                 r#"# CI environment — do not commit real values here, this is a fixture
 
-GOOGLE_MAPS_KEY=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY // sieve:ignore
+GOOGLE_MAPS_KEY=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY
 SENDGRID_API_KEY=SG.FakeFakeFakeFakeFakeFa.{}
-NPM_TOKEN=npm_abcdefghijklmnopqrstuvwxyz0123456789 // sieve:ignore
+NPM_TOKEN=npm_abcdefghijklmnopqrstuvwxyz0123456789
 SLACK_DEPLOY_WEBHOOK={}/T00000000/B00000000/FakeFakeFakeFakeFakeFake
 TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
 "#,
@@ -64,7 +64,7 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
                 r#"{{
   "service": "billing-worker",
   "api_key": "{}_live_FakeFakeFakeFakeFakeFakeFakeFakeFake",
-  "session_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U", // sieve:ignore
+  "session_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
   "retry_limit": 3
 }}"#,
                 "sk"
@@ -73,7 +73,7 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
 
         fs::write(
             dir.join("id_rsa"),
-            r#"-----BEGIN RSA PRIVATE KEY----- // sieve:ignore
+            r#"-----BEGIN RSA PRIVATE KEY-----
 TkkA/aW4gcmVhbCBsaWZlLCB0aGlzIHdvdWxkIGJlIGEgYmlnIGJsb2Igb2YgYmFzZTY0IGRhdGEsC3Qg
 c3QgaXQncyB0aGUgaGVhZGVyIHdlIGNhcmUgYWJvdXQgZGV0ZWN0aW5nLgoV2UgaGF2ZSB0byBtYWtl
 bmV2IGVub3VnaCBzbyB0aGUgZW50cm9weSBkZXRlY3RvciBkb2Vzbid0IGlnbm9yZSBpdCwgYW5k
@@ -146,7 +146,7 @@ fn secret_values_never_appear_unredacted_in_output() {
     sieve()
         .args(["scan", "tests/fixtures/dirty"])
         .assert()
-        .stdout(predicate::str::contains("AKIAIOSFODNN7EXAMPLE").not()) // sieve:ignore
+        .stdout(predicate::str::contains("AKIAIOSFODNN7EXAMPLE").not())
         .stdout(predicate::str::contains("ghp_16C7e42F292c6912E7710c838347Ae178B4a").not());
     // sieve:ignore
 }
@@ -211,7 +211,7 @@ fn history_flag_finds_secret_purged_from_working_tree() {
     git(&["config", "user.email", "test@example.com"]);
     git(&["config", "user.name", "Test"]);
 
-    fs::write(root.join("secret.py"), "TOKEN = \"AKIAIOSFODNN7EXAMPLE\"\n").unwrap(); // sieve:ignore
+    fs::write(root.join("secret.py"), "TOKEN = \"AKIAIOSFODNN7EXAMPLE\"\n").unwrap();
     git(&["add", "."]);
     git(&["commit", "-q", "-m", "oops, committed a key"]);
 
