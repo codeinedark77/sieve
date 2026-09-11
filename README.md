@@ -14,6 +14,56 @@ false-positive noise.
 Built to replace reflexively disabling secrets scanners after the tenth
 false positive on a lockfile hash.
 
+## 🔬 Core Architecture
+
+```mermaid
+graph TD
+    subgraph "Input Vectors"
+        WT[Working Tree]
+        ST[Staged Changes]
+        GH[Git History]
+    end
+
+    subgraph "Sieve Engine (Rust)"
+        WLK[Parallel File Walker]
+        DIFF[Diff Parser]
+        
+        REG[Regex Detectors]
+        ENT[Entropy Evaluator]
+        SAST[SAST Scanners]
+    end
+
+    subgraph "Output & Triage"
+        CLI[Terminal Output]
+        SAR[SARIF Report]
+        LLM[Local LLM Triage Ollama]
+    end
+    
+    WT --> WLK
+    ST --> DIFF
+    GH --> DIFF
+    
+    WLK --> REG
+    WLK --> ENT
+    WLK --> SAST
+    
+    DIFF --> REG
+    DIFF --> ENT
+    DIFF --> SAST
+    
+    REG --> CLI
+    ENT --> CLI
+    SAST --> CLI
+    
+    REG --> SAR
+    REG <--> LLM
+    
+    style WLK fill:#e74c3c,stroke:#fff,stroke-width:2px,color:#fff
+    style DIFF fill:#e74c3c,stroke:#fff,stroke-width:2px,color:#fff
+    style LLM fill:#8a2be2,stroke:#fff,stroke-width:2px,color:#fff
+    style SAR fill:#2c3e50,stroke:#fff,stroke-width:2px,color:#fff
+```
+
 ## Status
 
 | Layer | State |
