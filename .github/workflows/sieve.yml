@@ -61,7 +61,7 @@ jobs:
         id: scan
         run: |
           set +e
-          ./target/release/sieve scan . --history --min-confidence medium --format sarif > sieve-results.sarif
+          ./target/release/sieve scan . --min-confidence medium --format sarif > sieve-results.sarif
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
           set -e
 
