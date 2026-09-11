@@ -39,9 +39,10 @@ function notify(message) {{
 AWS_ACCESS_KEY_ID = "AKIA{}"
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-DB_URL = "postgresql://postgres:{}@localhost:5432/mydb" // sieve:ignore
+DB_URL = "postgresql:{}/postgres:{}@localhost:5432/mydb"
 "#,
                 "IOSFODNN7EXAMPLE",
+                "/",
                 "supersecretpassword"
             )
         ).unwrap();
@@ -57,7 +58,7 @@ NPM_TOKEN=npm_{}
 SLACK_DEPLOY_WEBHOOK={}/T00000000/B00000000/FakeFakeFakeFakeFakeFake
 TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
 "#,
-                 "SyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY", // sieve:ignore
+                 "SyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY",
                  "FakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFak",
                  "abcdefghijklmnopqrstuvwxyz0123456789",
                  "https://hooks.slack.com/services",
@@ -75,7 +76,7 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
   "retry_limit": 3
 }}"#,
                 "sk",
-                "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U" // sieve:ignore
+                "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
             )
         ).unwrap();
 
@@ -83,10 +84,10 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
             dir.join("id_rsa"),
             format!(
                 r#"-----BEGIN {} PRIVATE KEY-----
-TkkA/aW4gcmVhbCBsaWZlLCB0aGlzIHdvdWxkIGJlIGEgYmlnIGJsb2Igb2YgYmFzZTY0IGRhdGEsC3Qg // sieve:ignore
-c3QgaXQncyB0aGUgaGVhZGVyIHdlIGNhcmUgYWJvdXQgZGV0ZWN0aW5nLgoV2UgaGF2ZSB0byBtYWtl // sieve:ignore
-bmV2IGVub3VnaCBzbyB0aGUgZW50cm9weSBkZXRlY3RvciBkb2Vzbid0IGlnbm9yZSBpdCwgYW5k // sieve:ignore
-YWxsIGxpbmVzIG11c3QgYmUgYXQgbGVhc3QgMTYgY2hhcnMgbG9uZyBvciBpdCBza2lwcyB0aGVtLg== // sieve:ignore
+TkkA/aW4gcmVhbCBsaWZlLCB0aGlzIHdvdWxkIGJlIGEgYmlnIGJsb2Igb2YgYmFzZTY0IGRhdGEsC3Qg
+c3QgaXQncyB0aGUgaGVhZGVyIHdlIGNhcmUgYWJvdXQgZGV0ZWN0aW5nLgoV2UgaGF2ZSB0byBtYWtl
+bmV2IGVub3VnaCBzbyB0aGUgZW50cm9weSBkZXRlY3RvciBkb2Vzbid0IGlnbm9yZSBpdCwgYW5k
+YWxsIGxpbmVzIG11c3QgYmUgYXQgbGVhc3QgMTYgY2hhcnMgbG9uZyBvciBpdCBza2lwcyB0aGVtLg==
 -----END {} PRIVATE KEY-----
 "#,
                 "RSA",
