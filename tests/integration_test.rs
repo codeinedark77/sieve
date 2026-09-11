@@ -39,7 +39,7 @@ function notify(message) {{
 AWS_ACCESS_KEY_ID = "AKIA{}"
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-DB_URL = "postgresql://postgres:{}@localhost:5432/mydb"
+DB_URL = "postgresql://postgres:{}@localhost:5432/mydb" // sieve:ignore
 "#,
                 "IOSFODNN7EXAMPLE",
                 "supersecretpassword"
@@ -57,7 +57,7 @@ NPM_TOKEN=npm_{}
 SLACK_DEPLOY_WEBHOOK={}/T00000000/B00000000/FakeFakeFakeFakeFakeFake
 TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
 "#,
-                 "SyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY",
+                 "SyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY", // sieve:ignore
                  "FakeFakeFakeFakeFakeFakeFakeFakeFakeFakeFak",
                  "abcdefghijklmnopqrstuvwxyz0123456789",
                  "https://hooks.slack.com/services",
@@ -75,7 +75,7 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
   "retry_limit": 3
 }}"#,
                 "sk",
-                "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+                "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U" // sieve:ignore
             )
         ).unwrap();
 
@@ -83,10 +83,10 @@ TWILIO_API_KEY={}1234567890abcdef1234567890abcdef
             dir.join("id_rsa"),
             format!(
                 r#"-----BEGIN {} PRIVATE KEY-----
-TkkA/aW4gcmVhbCBsaWZlLCB0aGlzIHdvdWxkIGJlIGEgYmlnIGJsb2Igb2YgYmFzZTY0IGRhdGEsC3Qg
-c3QgaXQncyB0aGUgaGVhZGVyIHdlIGNhcmUgYWJvdXQgZGV0ZWN0aW5nLgoV2UgaGF2ZSB0byBtYWtl
-bmV2IGVub3VnaCBzbyB0aGUgZW50cm9weSBkZXRlY3RvciBkb2Vzbid0IGlnbm9yZSBpdCwgYW5k
-YWxsIGxpbmVzIG11c3QgYmUgYXQgbGVhc3QgMTYgY2hhcnMgbG9uZyBvciBpdCBza2lwcyB0aGVtLg==
+TkkA/aW4gcmVhbCBsaWZlLCB0aGlzIHdvdWxkIGJlIGEgYmlnIGJsb2Igb2YgYmFzZTY0IGRhdGEsC3Qg // sieve:ignore
+c3QgaXQncyB0aGUgaGVhZGVyIHdlIGNhcmUgYWJvdXQgZGV0ZWN0aW5nLgoV2UgaGF2ZSB0byBtYWtl // sieve:ignore
+bmV2IGVub3VnaCBzbyB0aGUgZW50cm9weSBkZXRlY3RvciBkb2Vzbid0IGlnbm9yZSBpdCwgYW5k // sieve:ignore
+YWxsIGxpbmVzIG11c3QgYmUgYXQgbGVhc3QgMTYgY2hhcnMgbG9uZyBvciBpdCBza2lwcyB0aGVtLg== // sieve:ignore
 -----END {} PRIVATE KEY-----
 "#,
                 "RSA",
@@ -159,7 +159,10 @@ fn secret_values_never_appear_unredacted_in_output() {
         .args(["scan", "tests/fixtures/dirty"])
         .assert()
         .stdout(predicate::str::contains(format!("AKIA{}", "IOSFODNN7EXAMPLE")).not())
-        .stdout(predicate::str::contains(format!("ghp_{}", "16C7e42F292c6912E7710c838347Ae178B4a")).not());
+        .stdout(
+            predicate::str::contains(format!("ghp_{}", "16C7e42F292c6912E7710c838347Ae178B4a"))
+                .not(),
+        );
     // sieve:ignore
 }
 
@@ -223,7 +226,11 @@ fn history_flag_finds_secret_purged_from_working_tree() {
     git(&["config", "user.email", "test@example.com"]);
     git(&["config", "user.name", "Test"]);
 
-    fs::write(root.join("secret.py"), format!("TOKEN = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE")).unwrap();
+    fs::write(
+        root.join("secret.py"),
+        format!("TOKEN = \"AKIA{}\"\n", "IOSFODNN7EXAMPLE"),
+    )
+    .unwrap();
     git(&["add", "."]);
     git(&["commit", "-q", "-m", "oops, committed a key"]);
 
@@ -291,7 +298,11 @@ fn max_file_size_mb_skips_oversized_files_via_the_real_cli() {
     .unwrap();
     fs::write(
         dir.path().join("huge.py"),
-        format!("AWS_KEY = \"AKIA{}\"\n{}", "IOSFODNN7EXAMPLE", "x".repeat(2000)), // sieve:ignore
+        format!(
+            "AWS_KEY = \"AKIA{}\"\n{}",
+            "IOSFODNN7EXAMPLE",
+            "x".repeat(2000)
+        ), // sieve:ignore
     )
     .unwrap();
 
