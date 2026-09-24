@@ -1,4 +1,4 @@
-# sieve
+# Local Secret Scanner (formerly sieve)
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
